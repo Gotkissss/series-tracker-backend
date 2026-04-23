@@ -1,0 +1,239 @@
+basePath: /
+definitions:
+  models.Series:
+    properties:
+      created_at:
+        type: string
+      episodes:
+        type: integer
+      genre:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      rating:
+        type: number
+      status:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API REST para gestionar series de televisión.
+  title: Series Tracker API
+  version: "1.0"
+paths:
+  /series:
+    get:
+      description: Retorna todas las series. Soporta búsqueda, paginación y ordenamiento.
+      parameters:
+      - description: Buscar por nombre
+        in: query
+        name: q
+        type: string
+      - description: 'Número de página (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Resultados por página (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - description: Campo por el que ordenar (title, rating, created_at)
+        in: query
+        name: sort
+        type: string
+      - description: 'Dirección del orden: asc o desc'
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Series'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar series
+      tags:
+      - series
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva serie en la base de datos
+      parameters:
+      - description: Datos de la serie
+        in: body
+        name: series
+        required: true
+        schema:
+          $ref: '#/definitions/models.Series'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Series'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Crear una serie
+      tags:
+      - series
+  /series/{id}:
+    delete:
+      description: Elimina una serie por su ID
+      parameters:
+      - description: ID de la serie
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Eliminar una serie
+      tags:
+      - series
+    get:
+      description: Retorna una serie por su ID
+      parameters:
+      - description: ID de la serie
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Series'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtener una serie
+      tags:
+      - series
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una serie existente
+      parameters:
+      - description: ID de la serie
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: series
+        required: true
+        schema:
+          $ref: '#/definitions/models.Series'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Series'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Editar una serie
+      tags:
+      - series
+  /series/{id}/image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Sube una imagen (JPG, PNG o WEBP, máx 1MB) y la asocia a la serie
+      parameters:
+      - description: ID de la serie
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Archivo de imagen
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Subir imagen de una serie
+      tags:
+      - series
+swagger: "2.0"

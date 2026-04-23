@@ -1,3 +1,9 @@
+// @title           Series Tracker API
+// @version         1.0
+// @description     API REST para gestionar series de televisión.
+// @host            localhost:8080
+// @BasePath        /
+
 package main
 
 import (
@@ -6,11 +12,13 @@ import (
 	"net/http"
 	"os"
 
+	_ "series-tracker-backend/docs"
 	"series-tracker-backend/db"
 	"series-tracker-backend/handlers"
 	"series-tracker-backend/middleware"
 
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func main() {
@@ -19,7 +27,10 @@ func main() {
 	r := mux.NewRouter()
 	r.Use(middleware.CORS)
 
-	// Servir imágenes estáticas desde /uploads
+	// Swagger UI disponible en /swagger/index.html
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+
+	// Servir imágenes estáticas
 	r.PathPrefix("/uploads/").Handler(
 		http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))),
 	)
@@ -38,5 +49,6 @@ func main() {
 	}
 
 	fmt.Println("Servidor corriendo en http://localhost:" + port)
+	fmt.Println("Swagger UI en http://localhost:" + port + "/swagger/index.html")
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }
