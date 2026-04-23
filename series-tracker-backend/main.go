@@ -1,7 +1,7 @@
 // @title           Series Tracker API
 // @version         1.0
 // @description     API REST para gestionar series de televisión.
-// @host            series-tracker-backend.onrender.com
+// @host            series-tracker-backend-rymf.onrender.com
 // @BasePath        /
 
 package main

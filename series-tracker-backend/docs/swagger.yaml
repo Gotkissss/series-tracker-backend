@@ -19,7 +19,7 @@ definitions:
       title:
         type: string
     type: object
-host: localhost:8080
+host: series-tracker-backend-rymf.onrender.com
 info:
   contact: {}
   description: API REST para gestionar series de televisión.

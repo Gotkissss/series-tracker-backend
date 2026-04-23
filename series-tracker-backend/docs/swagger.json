@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "series-tracker-backend-rymf.onrender.com",
     "basePath": "/",
     "paths": {
         "/series": {
