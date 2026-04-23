@@ -1,7 +1,7 @@
 // @title           Series Tracker API
 // @version         1.0
 // @description     API REST para gestionar series de televisión.
-// @host            localhost:8080
+// @host            series-tracker-backend.onrender.com
 // @BasePath        /
 
 package main
