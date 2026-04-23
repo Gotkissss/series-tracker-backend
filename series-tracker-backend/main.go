@@ -14,28 +14,29 @@ import (
 )
 
 func main() {
-	// Conectar a la base de datos
 	db.Connect()
 
-	// Crear el router
 	r := mux.NewRouter()
-
-	// Aplicar middleware de CORS a todas las rutas
 	r.Use(middleware.CORS)
 
-	// Rutas
+	// Servir imágenes estáticas desde /uploads
+	r.PathPrefix("/uploads/").Handler(
+		http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))),
+	)
+
+	// Rutas de la API
 	r.HandleFunc("/series", handlers.GetAllSeries).Methods("GET", "OPTIONS")
 	r.HandleFunc("/series/{id}", handlers.GetSeriesByID).Methods("GET", "OPTIONS")
 	r.HandleFunc("/series", handlers.CreateSeries).Methods("POST", "OPTIONS")
 	r.HandleFunc("/series/{id}", handlers.UpdateSeries).Methods("PUT", "OPTIONS")
 	r.HandleFunc("/series/{id}", handlers.DeleteSeries).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/series/{id}/image", handlers.UploadImage).Methods("POST", "OPTIONS")
 
-	// Puerto
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	fmt.Println("🚀 Servidor corriendo en http://localhost:" + port)
+	fmt.Println("Servidor corriendo en http://localhost:" + port)
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }

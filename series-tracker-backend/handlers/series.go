@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"os"
 	"strconv"
 
 	"series-tracker-backend/db"
@@ -229,4 +230,77 @@ func DeleteSeries(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent) // 204 - sin body
+}
+
+func UploadImage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		jsonError(w, http.StatusBadRequest, "ID inválido")
+		return
+	}
+
+	// Verificar que la serie existe
+	var exists bool
+	err = db.DB.QueryRow(`SELECT EXISTS(SELECT 1 FROM series WHERE id = $1)`, id).Scan(&exists)
+	if err != nil || !exists {
+		jsonError(w, http.StatusNotFound, "Serie no encontrada")
+		return
+	}
+
+	// Limitar tamaño a 1MB
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+	if err := r.ParseMultipartForm(1 << 20); err != nil {
+		jsonError(w, http.StatusBadRequest, "La imagen no puede superar 1MB")
+		return
+	}
+
+	file, header, err := r.FormFile("image")
+	if err != nil {
+		jsonError(w, http.StatusBadRequest, "No se encontró el campo 'image' en el formulario")
+		return
+	}
+	defer file.Close()
+
+	// Validar tipo de archivo
+	contentType := header.Header.Get("Content-Type")
+	if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/webp" {
+		jsonError(w, http.StatusBadRequest, "Solo se permiten imágenes JPG, PNG o WEBP")
+		return
+	}
+
+	// Guardar el archivo con nombre único basado en el ID
+	ext := ".jpg"
+	if contentType == "image/png" {
+		ext = ".png"
+	} else if contentType == "image/webp" {
+		ext = ".webp"
+	}
+
+	filename := "series_" + strconv.Itoa(id) + ext
+	filepath := "uploads/" + filename
+
+	dst, err := os.Create(filepath)
+	if err != nil {
+		jsonError(w, http.StatusInternalServerError, "Error guardando la imagen")
+		return
+	}
+	defer dst.Close()
+
+	buf := make([]byte, 1<<20)
+	n, _ := file.Read(buf)
+	dst.Write(buf[:n])
+
+	// Construir la URL pública
+	scheme := "http"
+	imageURL := scheme + "://" + r.Host + "/uploads/" + filename
+
+	// Actualizar image_url en la base de datos
+	_, err = db.DB.Exec(`UPDATE series SET image_url = $1 WHERE id = $2`, imageURL, id)
+	if err != nil {
+		jsonError(w, http.StatusInternalServerError, "Error actualizando la URL de imagen")
+		return
+	}
+
+	jsonResponse(w, http.StatusOK, map[string]string{"image_url": imageURL})
 }
