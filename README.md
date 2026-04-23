@@ -67,6 +67,15 @@ CORS es una política de seguridad del navegador que bloquea peticiones HTTP ent
 - Ordenamiento con sort y order
 - Subida de imágenes (max 1MB, guardadas como base64 en PostgreSQL)
 
+## Reflexión
+Trabajar con Go fue un reto interesante. La sintaxis es bastante estricta y el compilador no deja pasar errores, pero eso también ayuda a que el código sea más confiable.
 
+El deploy en Render me tomó más tiempo de lo que esperaba, especialmente por problemas con la detección del runtime.
+
+Guardar las imágenes como base64 en la base de datos tampoco era mi primera opción, pero terminó siendo lo más práctico, especialmente porque el plan gratuito de Render no ofrece almacenamiento persistente.
+
+Volvería a usar esta combinación en proyectos donde sea importante mantener bien separada la lógica de los datos y la presentación.
 
 ## Screenshot
+<img width="1863" height="912" alt="image" src="https://github.com/user-attachments/assets/97c1fb43-de5d-4cff-9d1b-44c326d26d66" />
+
